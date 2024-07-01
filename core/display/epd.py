@@ -2,7 +2,6 @@ import logging
 import os
 import time
 
-from typing import *
 from PIL import Image
 
 from lib.waveshare_epd import epd2in7_V2
@@ -22,7 +21,6 @@ class EPD(Display):
         super().__init__(size)
 
 
-    @override()
     def show_image(self, image: Image.Image):
         try:
             self.epd.init_Fast()
@@ -32,7 +30,6 @@ class EPD(Display):
             self.clean()
             raise
 
-    @override()
     def clear(self):
         try:
             self.epd.init()

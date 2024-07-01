@@ -4,7 +4,7 @@ import time
 
 from PIL import Image, ImageDraw, ImageFont
 
-from display.epd import EPD 
+from .display.epd import EPD 
 
 logging.basicConfig(level=logging.DEBUG)
 
