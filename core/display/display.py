@@ -4,11 +4,15 @@ from PIL import Image
 
 class Display:
 
-    def __init__(self, size: Tuple[int, int]) -> None:
-        self.size = size
+    def __init__(self, width, height) -> None:
+        self.width = width
+        self.height = height
 
-    def show_image(image: Image.Image):
+    def show_image(self, image: Image.Image):
         pass
 
-    def clear():
+    def clear(self):
+        pass
+
+    def clean(self):
         pass

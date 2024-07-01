@@ -17,8 +17,7 @@ class EPD(Display):
             logging.critical("Failed to create EPD class!")
             logging.debug(e)
 
-        size = (self.epd.height, self.epd.width)
-        super().__init__(size)
+        super().__init__(self.epd.height, self.epd.width)
 
 
     def show_image(self, image: Image.Image):

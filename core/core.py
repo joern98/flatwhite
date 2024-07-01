@@ -1,10 +1,14 @@
 import logging
 import os
 import time
+import platform
 
 from PIL import Image, ImageDraw, ImageFont
 
-from .display.epd import EPD 
+if platform.system() == "Linux":
+    from .display.epd import EPD as Display
+elif platform.system() == "Windows":
+    from .display.debug_display import DebugDisplay as Display
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -29,10 +33,10 @@ def get_test_image_h(width, height):
         return image
 
 def main():
-    epd = EPD()
+    epd = Display()
 
     try:
-        image = get_test_image_h(epd.size[0], epd.size[1])
+        image = get_test_image_h(epd.width, epd.height)
         epd.show_image(image)
 
         time.sleep(5)
