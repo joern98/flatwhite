@@ -39,6 +39,6 @@ class EPD(Display):
             self.clean()
             raise
 
-    def clean():
+    def clean(self):
         logging.debug("Calling module_exit() for cleanup")
         epd2in7_V2.epdconfig.module_exit(cleanup=True)
