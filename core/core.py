@@ -4,6 +4,9 @@ import time
 import platform
 
 from PIL import Image, ImageDraw, ImageFont
+from .ui.Component import Component
+from .ui.Layout import Layout, VerticalLayout, HorizontalLayout
+from .ui.Text import Text
 
 if platform.system() == "Linux":
     from .display.epd import EPD as Display
@@ -36,7 +39,23 @@ def main():
     epd = Display()
 
     try:
-        image = get_test_image_h(epd.width, epd.height)
+        image = Image.new('1', (epd.width, epd.height), 0xff)
+        draw = ImageDraw.Draw(image)
+        draw.font = font18
+
+        root = HorizontalLayout()
+        root.size = image.size
+        v1 = VerticalLayout()
+        v1.append_child(Text("ABC"), 1)
+        v1.append_child(Text("123"), 1)
+        v2 = VerticalLayout()
+        v2.append_child(Text("DEF"), 1)
+        v2.append_child(Text("456"), 1)
+        root.append_child(v1, 2)
+        root.append_child(v2, 1)
+        root.draw(draw)
+
+
         epd.show_image(image)
 
         time.sleep(5)
