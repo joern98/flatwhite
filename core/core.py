@@ -3,6 +3,12 @@ import os
 import time
 import platform
 
+import soco
+from soco import events_twisted
+soco.config.EVENTS_MODULE = events_twisted
+from twisted.internet import reactor
+
+
 from PIL import Image, ImageDraw, ImageFont
 from .ui.Component import Component, Text, ProgressBar
 from .ui.Layout import Layout, VerticalLayout, HorizontalLayout
@@ -34,8 +40,17 @@ def get_test_image_h(width, height):
         draw.text((width-1, 0), "(263, 0)", fill=0, anchor="ra") 
         return image
 
+def setup_sonos():
+     sonos = soco.SoCo("192.168.178.26")
+     logging.info(sonos.player_name)
+     logging.info(sonos.ip_address)
+     return sonos
+
+     
 def main():
     epd = Display()
+
+    sonos = setup_sonos()
 
     try:
         image = Image.new('1', (epd.width, epd.height), 0xff)
@@ -50,9 +65,9 @@ def main():
         v1.append_child(Text("C", True), 1)
         v1.append_child(Text("D", True), 1)
         v2 = VerticalLayout()
-        title_text = Text("Slow Dancing in a Burning Room")
+        title_text = Text("...")
         title_text.padding = (4, 4, 4, 4)
-        artist_text = Text("John Mayer")
+        artist_text = Text("...")
         artist_text.padding = (4, 4, 4, 4)
         v2.append_child(title_text, 50)
         v2.append_child(artist_text, 30)
@@ -64,13 +79,44 @@ def main():
         root.append_child(v2, 95)
 
         root.draw(draw)
-        epd.show_image(image)             
+        epd.show_image(image)     
 
-        epd.clear()
-        epd.clean()
+        last_event_timestamp = 0        
 
-    except KeyboardInterrupt:
-        logging.warning("Keyboard interrupt, clear and exit")
-        epd.clear()
-        epd.clean()
-        exit(1) 
+        def on_av_event(event):
+            nonlocal last_event_timestamp
+            try:
+                logging.debug(f"av_event {event.seq}")
+                logging.debug(event.variables)
+                logging.debug(event.timestamp)
+                if event.timestamp - last_event_timestamp < 1:
+                     return
+                last_event_timestamp = event.timestamp
+                track_info = sonos.get_current_track_info()
+                title_text.text = track_info["title"]
+                artist_text.text = track_info["artist"]
+                image = Image.new('1', epd.size(), 0xff)
+                draw = ImageDraw.Draw(image)
+                draw.font = font18
+                root.draw(draw)
+                epd.show_image(image)
+
+            except Exception as e:
+                logging.error('There was an error handling the event')
+                logging.debug(e)
+
+
+        av_subscription: soco.events.Subscription = sonos.avTransport.subscribe().subscription
+        av_subscription.callback = on_av_event
+
+
+        def before_shutdown():
+            epd.clear()
+            epd.clean()
+
+        reactor.addSystemEventTrigger("before", "shutdown", before_shutdown)
+    
+    except Exception as e:
+         logging.error("An error occurred")
+         logging.debug(e)
+         exit(1)
