@@ -4,14 +4,13 @@ import time
 import platform
 
 from PIL import Image, ImageDraw, ImageFont
-from .ui.Component import Component
+from .ui.Component import Component, Text, ProgressBar
 from .ui.Layout import Layout, VerticalLayout, HorizontalLayout
-from .ui.Text import Text
 
 if platform.system() == "Linux":
     from .display.epd import EPD as Display
 elif platform.system() == "Windows":
-    from .display.debug_display import DebugDisplay as Display
+    from .display.display import DebugDisplay as Display
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -46,19 +45,26 @@ def main():
         root = HorizontalLayout()
         root.size = image.size
         v1 = VerticalLayout()
-        v1.append_child(Text("ABC"), 1)
-        v1.append_child(Text("123"), 1)
+        v1.append_child(Text("A", True), 1)
+        v1.append_child(Text("B", True), 1)
+        v1.append_child(Text("C", True), 1)
+        v1.append_child(Text("D", True), 1)
         v2 = VerticalLayout()
-        v2.append_child(Text("DEF"), 1)
-        v2.append_child(Text("456"), 1)
-        root.append_child(v1, 2)
-        root.append_child(v2, 1)
+        title_text = Text("Slow Dancing in a Burning Room")
+        title_text.padding = (4, 4, 4, 4)
+        artist_text = Text("John Mayer")
+        artist_text.padding = (4, 4, 4, 4)
+        v2.append_child(title_text, 50)
+        v2.append_child(artist_text, 30)
+        #progress = ProgressBar()
+        #progress.padding = (2, 2, 2, 2)
+        #v2.append_child(progress, 10)
+        #v2.append_child(Component(), 10)
+        root.append_child(v1, 5)
+        root.append_child(v2, 95)
+
         root.draw(draw)
-
-
-        epd.show_image(image)
-
-        time.sleep(5)
+        epd.show_image(image)             
 
         epd.clear()
         epd.clean()
