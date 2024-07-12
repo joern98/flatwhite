@@ -1,16 +1,43 @@
+from typing import Tuple
 import logging
-import os
-import time
 
 from PIL import Image
 
-from lib.waveshare_epd import epd2in7_V2
+# Base Display class
+class Display:
 
-from .display import Display
+    def __init__(self, width, height) -> None:
+        self.width = width
+        self.height = height
+    
+    def size(self):
+        return (self.width, self.height)
 
+    def show_image(self, image: Image.Image):
+        pass
+
+    def clear(self):
+        pass
+
+    def clean(self):
+        pass
+
+
+# ImageShow output display for debuggung purposes, using PIL.Image.show()
+class ImageShow(Display):
+
+    def __init__(self, width = 264, height = 176) -> None:
+        super().__init__(width, height)
+
+    def show_image(self, image: Image.Image):
+        image.show(f"ImageShow, {self.width}x{self.height}")
+
+
+# EPD (E-Paper Display) output
 class EPD(Display):
 
     def __init__(self) -> None:
+        from lib.waveshare_epd import epd2in7_V2
         try:
             self.epd = epd2in7_V2.EPD()
         except Exception as e:
