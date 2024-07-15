@@ -14,7 +14,7 @@ from src.gui import *
 
 if platform.system() == "Linux":
     from src.output import EPD as Output
-elif platform.system() == "Windows":
+elif platform.system() in ["Windows", "Darwin"]:
     from src.output import ImageShow as Output
 
 logging.basicConfig(level=logging.DEBUG)
