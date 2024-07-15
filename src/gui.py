@@ -109,6 +109,7 @@ class GUI_Renderer:
     def render(self, elements: List[GUIElement]):
         image = Image.new('1', (self.width, self.height), 0xFF)
         draw = ImageDraw.Draw(image)
+        draw.font = self.__font18
         for e in elements:
             e.draw(draw)
         self.__image = image
