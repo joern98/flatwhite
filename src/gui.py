@@ -1,9 +1,11 @@
 import logging
+import os
 from typing import List
 
 from PIL import Image, ImageDraw, ImageFont
 
 from .output import Output
+from .config import RESOURCE_PATH
 
 class GUI_Model:
 
@@ -53,7 +55,7 @@ class Textbox(GUIElement):
 
     def __get_max_line_length(self, text, canvas: ImageDraw.ImageDraw):
         i = 0
-        while canvas.textbbox(self.bounds()[:2], text[:i])[2] <= self.x1:
+        while canvas.textbbox(self.bounds()[:2], text[:i])[2] <= self.x1 and i < len(text):
             i += 1
         return i
     
@@ -99,6 +101,7 @@ class GUI_Renderer:
         self.__image = None
         self.width = width
         self.height = height
+        self.__font18 = ImageFont.truetype(os.path.join(RESOURCE_PATH, "Font.ttc"), 18)
 
     def get_image(self):
         return self.__image
@@ -140,6 +143,8 @@ class GUI_Builder:
         e = Textbox(x0, y0, x1, y1, text)
         self.__elements.append(e)
         return e
+    
+
 
 
 
