@@ -9,18 +9,23 @@ soco.config.EVENTS_MODULE = events_twisted
 from twisted.internet import reactor
 from PIL import Image, ImageDraw, ImageFont
 
-from src.gui import *
-
+from .gui import *
 
 if platform.system() == "Linux":
-    from src.output import EPD as Output
+    from .output import EPD as Output
 elif platform.system() in ["Windows", "Darwin"]:
-    from src.output import ImageShow as Output
+    from .output import ImageShow as Output
 
 logging.basicConfig(level=logging.DEBUG)
 
 RESOURCE_PATH = os.path.join(os.path.dirname(__file__), "..", "res")
 logging.debug(f"RESOURCE_PATH = {RESOURCE_PATH}")
+
+BLACK = 0x00
+WHITE = 0xFF
+
+WIDTH = 264
+HEIGHT = 176
 
 font18 = ImageFont.truetype(os.path.join(RESOURCE_PATH, "Font.ttc"), 18)
 
@@ -45,11 +50,19 @@ def setup_sonos():
      logging.info(sonos.ip_address)
      return sonos
 
+def setup_gui(output):
+    b = GUI.builder()
+    b.set_output(output)
+    b.set_size(WIDTH, HEIGHT)
+    b.rectangle(0, 0, WIDTH-1, HEIGHT-1)
+    b.rectangle(WIDTH//3, HEIGHT//3, WIDTH-1, HEIGHT-1)
+    b.rectangle(2*WIDTH//3, 2*HEIGHT//3, WIDTH-1, HEIGHT-1)
+    b.textbox(2*WIDTH//3, 2*HEIGHT//3, WIDTH-1, HEIGHT-1, "Hello World, my ass is on fire up in here")
+    return b.build()
      
 def main():
     output = Output()
-
-    gui = GUI(output)
+    gui = setup_gui(output)    
     gui.update()
 
     def before_shutdown():

@@ -4,7 +4,7 @@ import logging
 from PIL import Image
 
 # Base Display class
-class Display:
+class Output:
 
     def __init__(self, width, height) -> None:
         self.width = width
@@ -24,7 +24,7 @@ class Display:
 
 
 # ImageShow output display for debuggung purposes, using PIL.Image.show()
-class ImageShow(Display):
+class ImageShow(Output):
 
     def __init__(self, width = 264, height = 176) -> None:
         super().__init__(width, height)
@@ -34,7 +34,7 @@ class ImageShow(Display):
 
 
 # EPD (E-Paper Display) output
-class EPD(Display):
+class EPD(Output):
 
     def __init__(self) -> None:
         from lib.waveshare_epd import epd2in7_V2
@@ -45,6 +45,8 @@ class EPD(Display):
             logging.debug(e)
 
         super().__init__(self.epd.height, self.epd.width)
+
+        self.__module_exit = epd2in7_V2.epdconfig.module_exit
 
 
     def show_image(self, image: Image.Image):
@@ -67,4 +69,4 @@ class EPD(Display):
 
     def clean(self):
         logging.debug("Calling module_exit() for cleanup")
-        epd2in7_V2.epdconfig.module_exit(cleanup=True)
+        self.__module_exit(cleanup=True)
