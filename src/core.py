@@ -57,12 +57,15 @@ def setup_gui(output):
     b.rectangle(0, 0, WIDTH-1, HEIGHT-1)
     b.rectangle(WIDTH//3, HEIGHT//3, WIDTH-1, HEIGHT-1)
     b.rectangle(2*WIDTH//3, 2*HEIGHT//3, WIDTH-1, HEIGHT-1)
-    b.textbox(2*WIDTH//3, 2*HEIGHT//3, WIDTH-1, HEIGHT-1, "Hello World, my ass is on fire up in here")
-    return b.build()
+    t = b.textbox(2*WIDTH//3, 2*HEIGHT//3, WIDTH-1, HEIGHT-1, "Hello World, my ass is on fire up in here")
+    return b.build(), t
      
 def main():
     output = Output()
-    gui = setup_gui(output)    
+    gui, t = setup_gui(output)    
+    gui.update()
+    time.sleep(2)
+    t.text = "This is the changed text, it is now different as fuck"
     gui.update()
 
     def before_shutdown():

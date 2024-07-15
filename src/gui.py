@@ -48,28 +48,30 @@ class Textbox(GUIElement):
     def draw(self, canvas: ImageDraw.ImageDraw):
         adjusted_text = self.__get_adjusted_text(canvas)
         canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=0)
-        logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.text}' adjusted to '{repr(adjusted_text)}'")
+        logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.text}' adjusted to {repr(adjusted_text)}")
 
 
-    def __get_max_line_length(self, canvas: ImageDraw.ImageDraw):
+    def __get_max_line_length(self, text, canvas: ImageDraw.ImageDraw):
         i = 0
-        while canvas.textbbox(self.bounds()[:2], self.text[:i])[2] <= self.x1:
+        while canvas.textbbox(self.bounds()[:2], text[:i])[2] <= self.x1:
             i += 1
         return i
     
-    def __find_previous_space_index(self, start):
+    def __find_previous_space_index(self, text, start):
         for i in range(start, 0, -1):
-            if self.text[i] == ' ':
+            if text[i] == ' ':
                 return i
             
-    def __get_adjusted_text(self, canvas):
-        text_bounds = canvas.multiline_textbbox(self.bounds(), self.text)
-        if text_bounds[2] > self.x1:
-            new_line_pos = self.__find_previous_space_index(self.__get_max_line_length(canvas))
-            a = self.text[:new_line_pos]
-            b = self.text[new_line_pos+1:]
-            return a + '\n' + b
-        return self.text
+    def __get_adjusted_text(self, canvas: ImageDraw.ImageDraw):
+        a, b = "", self.text
+        max_line_length = self.__get_max_line_length(self.text, canvas)
+        while canvas.multiline_textbbox(self.bounds()[:2], b)[2] > self.x1:
+            new_line_pos = self.__find_previous_space_index(b, max_line_length)
+            a += b[:new_line_pos]
+            a += '\n' 
+            b = b[new_line_pos+1:]
+        a += b
+        return a
 
 class GUI:
 
