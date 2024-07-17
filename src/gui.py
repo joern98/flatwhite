@@ -43,13 +43,20 @@ class Rectangle(GUIElement):
         logging.debug(f"Draw rectangle on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)}")
 
 class Textbox(GUIElement):
-    def __init__(self, x0, y0, x1, y1, text) -> None:
+
+    __fonts = [ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 24), 
+               ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 16)]
+    LARGE = 0
+    SMALL = 1
+
+    def __init__(self, x0, y0, x1, y1, text, font=LARGE) -> None:
         super().__init__(x0, y0, x1, y1)
         self.text = text
+        self.font_index = font
 
     def draw(self, canvas: ImageDraw.ImageDraw):
         adjusted_text = self.__get_adjusted_text(canvas)
-        canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=0)
+        canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=0, font=self.__fonts[self.font_index])
         logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.text}' adjusted to {repr(adjusted_text)}")
 
 
@@ -101,7 +108,7 @@ class GUI_Renderer:
         self.__image = None
         self.width = width
         self.height = height
-        self.__font18 = ImageFont.truetype(os.path.join(RESOURCE_PATH, "Font.ttc"), 18)
+
 
     def get_image(self):
         return self.__image
@@ -109,7 +116,6 @@ class GUI_Renderer:
     def render(self, elements: List[GUIElement]):
         image = Image.new('1', (self.width, self.height), 0xFF)
         draw = ImageDraw.Draw(image)
-        draw.font = self.__font18
         for e in elements:
             e.draw(draw)
         self.__image = image
@@ -129,21 +135,16 @@ class GUI_Builder:
 
     def set_output(self, output):
         self.__output = output
+        return self
     
     def set_size(self, width, height):
         self.width = width
         self.height = height
+        return self
 
-    def rectangle(self, x0, y0, x1, y1, border_color=0x00, fill=None, border_width=1):
-        # Draw simple rectangle with bounds x0, y0, x1, y1
-        e = Rectangle(x0, y0, x1, y1, fill, border_color, border_width)
-        self.__elements.append(e)
-        return e
-
-    def textbox(self, x0, y0, x1, y1, text):
-        e = Textbox(x0, y0, x1, y1, text)
-        self.__elements.append(e)
-        return e
+    def add_element(self, element):
+        self.__elements.append(element)
+        return self
     
 
 

@@ -24,19 +24,20 @@ WHITE = 0xFF
 WIDTH = 264
 HEIGHT = 176
 
-tb_title = None
-tb_artist = None
+textbox_title = None
+textbox_artist = None
+
 
 def setup_gui(output):
-    global tb_title, tb_artist
+    global textbox_title, textbox_artist
 
     PAD_X = 2
     PAD_Y = 2
-    b = GUI.builder()
-    b.set_output(output)
-    b.set_size(WIDTH, HEIGHT)
-    tb_title = b.textbox(PAD_X, PAD_Y, WIDTH-PAD_X-1, PAD_Y+49, "...")
-    tb_artist = b.textbox(PAD_X, PAD_Y+50, WIDTH-PAD_X-1, HEIGHT-PAD_Y-1, "...")
+    b = GUI.builder().set_output(output).set_size(WIDTH, HEIGHT)
+
+    textbox_title = Textbox(PAD_X, PAD_Y, WIDTH-PAD_X-1, PAD_Y+49, "...", font=Textbox.LARGE)
+    textbox_artist = Textbox(PAD_X, PAD_Y+50, WIDTH-PAD_X-1, HEIGHT-PAD_Y-1, "...", font=Textbox.SMALL)
+    b.add_element(textbox_title).add_element(textbox_artist)
     return b.build()
      
 def main():
@@ -46,9 +47,9 @@ def main():
     sonos_service = SonosService()
 
     def change_callback(title, artist):
-        global tb_title, tb_artist
-        tb_title.text = title
-        tb_artist.text = artist
+        global textbox_title, textbox_artist
+        textbox_title.text = title
+        textbox_artist.text = artist
         gui.update()
         
     sonos_service.on_change(change_callback)
