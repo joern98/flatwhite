@@ -3,6 +3,11 @@ import logging
 
 from PIL import Image
 
+try:
+    from lib.waveshare_epd import epd2in7_V2
+except:
+    logging.warning("Failed to import epd2in7_V2 module, EPD will not work!")
+
 # Base Display class
 class Output:
 
@@ -37,7 +42,6 @@ class ImageShow(Output):
 class EPD(Output):
 
     def __init__(self) -> None:
-        from lib.waveshare_epd import epd2in7_V2
         try:
             self.epd = epd2in7_V2.EPD()
             self.epd.TurnOnDisplay_4GRAY()
