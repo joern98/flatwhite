@@ -39,7 +39,7 @@ def setup_gui(output):
      
 def main():
     output = Output()
-    gui= setup_gui(output)    
+    gui = setup_gui(output)    
 
     sonos_service = SonosService()
 

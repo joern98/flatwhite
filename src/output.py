@@ -44,7 +44,6 @@ class EPD(Output):
     def __init__(self) -> None:
         try:
             self.epd = epd2in7_V2.EPD()
-            self.epd.TurnOnDisplay_4GRAY()
         except Exception as e:
             logging.critical("Failed to create EPD class!")
             logging.debug(e)
