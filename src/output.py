@@ -51,8 +51,8 @@ class EPD(Output):
 
     def show_image(self, image: Image.Image):
         try:
-            self.epd.init_Fast()
-            self.epd.display_Fast(self.epd.getbuffer(image))
+            self.epd.Init_4Gray()
+            self.epd.display_4Gray(self.epd.getbuffer(image))
             self.epd.sleep()
         except:
             self.clean()

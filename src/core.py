@@ -7,7 +7,7 @@ from twisted.internet import reactor
 
 from .sonos import SonosService
 from .gui import *
-from .config import RESOURCE_PATH
+from .constants import RESOURCE_PATH, BLACK, GRAY_DARK, GRAY_LIGHT, WHITE
 
 if platform.system() == "Linux":
     from .output import EPD as Output
@@ -17,9 +17,6 @@ elif platform.system() in ["Windows", "Darwin"]:
 logging.basicConfig(level=logging.DEBUG)
 
 logging.debug(f"RESOURCE_PATH = {RESOURCE_PATH}")
-
-BLACK = 0x00
-WHITE = 0xFF
 
 WIDTH = 264
 HEIGHT = 176
@@ -35,8 +32,8 @@ def setup_gui(output):
     PAD_Y = 2
     b = GUI.builder().set_output(output).set_size(WIDTH, HEIGHT)
 
-    textbox_title = Textbox(PAD_X, PAD_Y, WIDTH-PAD_X-1, PAD_Y+49, "...", font=Textbox.LARGE)
-    textbox_artist = Textbox(PAD_X, PAD_Y+50, WIDTH-PAD_X-1, HEIGHT-PAD_Y-1, "...", font=Textbox.SMALL)
+    textbox_title = Textbox(PAD_X, PAD_Y, WIDTH-PAD_X-1, PAD_Y+77, "...", font=Textbox.LARGE, color=BLACK)
+    textbox_artist = Textbox(PAD_X, PAD_Y+78, WIDTH-PAD_X-1, HEIGHT-PAD_Y-1, "...", font=Textbox.SMALL, color=GRAY_DARK)
     b.add_element(textbox_title).add_element(textbox_artist)
     return b.build()
      

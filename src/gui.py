@@ -5,7 +5,7 @@ from typing import List
 from PIL import Image, ImageDraw, ImageFont
 
 from .output import Output
-from .config import RESOURCE_PATH
+from .constants import RESOURCE_PATH, BLACK, WHITE, GRAY_LIGHT, GRAY_DARK
 
 class GUI_Model:
 
@@ -32,7 +32,7 @@ class GUIElement:
         return (self.x0, self.y0, self.x1, self.y1)
 
 class Rectangle(GUIElement):
-    def __init__(self, x0, y0, x1, y1, fill=None, border_color=0x00, border_width=1) -> None:
+    def __init__(self, x0, y0, x1, y1, fill=None, border_color=BLACK, border_width=1) -> None:
         super().__init__(x0, y0, x1, y1)
         self.fill = fill
         self.border_color = border_color
@@ -45,24 +45,25 @@ class Rectangle(GUIElement):
 class Textbox(GUIElement):
 
     __fonts = [ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 24), 
-               ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 16)]
+               ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 18)]
     LARGE = 0
     SMALL = 1
 
-    def __init__(self, x0, y0, x1, y1, text, font=LARGE) -> None:
+    def __init__(self, x0, y0, x1, y1, text, font=LARGE, color=BLACK) -> None:
         super().__init__(x0, y0, x1, y1)
         self.text = text
         self.font_index = font
+        self.color = color
 
     def draw(self, canvas: ImageDraw.ImageDraw):
         adjusted_text = self.__get_adjusted_text(canvas)
-        canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=0, font=self.__fonts[self.font_index])
+        canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=self.color, font=self.__fonts[self.font_index])
         logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.text}' adjusted to {repr(adjusted_text)}")
 
 
     def __get_max_line_length(self, text, canvas: ImageDraw.ImageDraw):
         i = 0
-        while canvas.textbbox(self.bounds()[:2], text[:i])[2] <= self.x1 and i < len(text):
+        while canvas.textbbox(self.bounds()[:2], text[:i], font=self.__fonts[self.font_index])[2] <= self.x1 and i < len(text):
             i += 1
         return i
     
@@ -74,7 +75,7 @@ class Textbox(GUIElement):
     def __get_adjusted_text(self, canvas: ImageDraw.ImageDraw):
         a, b = "", self.text
         max_line_length = self.__get_max_line_length(self.text, canvas)
-        while canvas.multiline_textbbox(self.bounds()[:2], b)[2] > self.x1:
+        while canvas.multiline_textbbox(self.bounds()[:2], b, font=self.__fonts[self.font_index])[2] > self.x1:
             new_line_pos = self.__find_previous_space_index(b, max_line_length)
             a += b[:new_line_pos]
             a += '\n' 
@@ -114,7 +115,7 @@ class GUI_Renderer:
         return self.__image
     
     def render(self, elements: List[GUIElement]):
-        image = Image.new('1', (self.width, self.height), 0xFF)
+        image = Image.new('L', (self.width, self.height), WHITE)
         draw = ImageDraw.Draw(image)
         for e in elements:
             e.draw(draw)
