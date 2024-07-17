@@ -54,7 +54,7 @@ class EPD(Output):
         try:
             self.epd.init()
             self.epd.Init_4Gray()
-            self.epd.display_4Gray(self.epd.getbuffer(image))
+            self.epd.display_4Gray(self.epd.getbuffer_4Gray(image))
             self.epd.sleep()
         except:
             self.clean()
