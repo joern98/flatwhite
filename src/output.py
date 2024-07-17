@@ -56,6 +56,7 @@ class EPD(Output):
 
     def show_image(self, image: Image.Image):
         try:
+            self.epd.init_Fast()
             self.epd.Init_4Gray()
             self.epd.display_4Gray(self.epd.getbuffer(image))
             self.epd.sleep()
