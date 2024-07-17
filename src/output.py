@@ -50,12 +50,9 @@ class EPD(Output):
 
         super().__init__(self.epd.height, self.epd.width)
 
-        self.__module_exit = epd2in7_V2.epdconfig.module_exit
-
-
     def show_image(self, image: Image.Image):
         try:
-            self.epd.init_Fast()
+            self.epd.init()
             self.epd.Init_4Gray()
             self.epd.display_4Gray(self.epd.getbuffer(image))
             self.epd.sleep()
@@ -74,4 +71,4 @@ class EPD(Output):
 
     def clean(self):
         logging.debug("Calling module_exit() for cleanup")
-        self.__module_exit(cleanup=True)
+        epd2in7_V2.epdconfig.module_exit(cleanup=True)
