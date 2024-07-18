@@ -8,6 +8,7 @@ from twisted.internet import reactor
 from .sonos import SonosService
 from .gui import *
 from .constants import RESOURCE_PATH, BLACK, GRAY_DARK, GRAY_LIGHT, WHITE
+from .input import KEY1_PRESSED, KEY2_PRESSED
 
 if platform.system() == "Linux":
     from .output import EPD as Output
@@ -49,7 +50,9 @@ def main():
         textbox_artist.text = artist
         gui.update()
         
-    sonos_service.on_change(change_callback)
+    sonos_service.on_change(change_callback)    
+
+    KEY1_PRESSED.subscribe(reactor.stop)
 
     def before_shutdown():
         output.clear()
