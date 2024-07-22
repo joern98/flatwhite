@@ -17,7 +17,7 @@ if platform.system() == "Linux":
 elif platform.system() in ["Windows", "Darwin"]:
     from .output import ImageShow as Output
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, filename="flatwhite_log.txt")
 
 logging.debug(f"RESOURCE_PATH = {RESOURCE_PATH}")
 
