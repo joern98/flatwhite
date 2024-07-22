@@ -103,8 +103,7 @@ class GUIImage(GUIElement):
         i1 = Image.eval(i, lambda x: x if x >= 48 and x < 128+32 else 0)
         i2 = Image.eval(i, lambda x: x if x >= 128+32 and x < 192+16 else 0)
         i3 = Image.eval(i, lambda x: x if x >= 192+16 else 0)
-        i0b = i0.convert('1', dither=Image.Dither.NONE)
-        i1b = i1.convert('1', dither=Image.Dither.NONE)
+        i1b = i1.convert('1', dither=Image.Dither.FLOYDSTEINBERG)
         i2b = i2.convert('1', dither=Image.Dither.NONE)
         i3b = i3.convert('1', dither=Image.Dither.NONE)
 
