@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import logging
 
 import soco
@@ -6,6 +7,12 @@ soco.config.EVENTS_MODULE = events_twisted
 
 import json
 
+@dataclass
+class TrackDataPayload:
+    title: str
+    artist: str
+    album: str
+    album_art_uri: str
 
 class SonosService:
 
@@ -30,7 +37,8 @@ class SonosService:
         self.__current_track_uri = event.variables["current_track_uri"]
 
         track_meta_data = event.variables["current_track_meta_data"]
-        self.__on_change_callback(track_meta_data.title, track_meta_data.creator)
+        payload = TrackDataPayload(track_meta_data.title, track_meta_data.creator, track_meta_data.album, track_meta_data.album_art_uri)
+        self.__on_change_callback(payload)
 
     def on_change(self, callback):
         self.__on_change_callback = callback

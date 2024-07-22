@@ -2,7 +2,7 @@ import logging
 import os
 from typing import List
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImagePalette
 
 from .output import Output
 from .constants import RESOURCE_PATH, BLACK, WHITE, GRAY_LIGHT, GRAY_DARK
@@ -82,6 +82,45 @@ class Textbox(GUIElement):
             b = b[new_line_pos+1:]
         a += b
         return a
+    
+class GUIImage(GUIElement):
+
+
+    def __init__(self, x0, y0, x1, y1, image: Image.Image) -> None:
+        super().__init__(x0, y0, x1, y1)
+        self.__image = image
+        self.__quantized_image = self.__quantize_image(image)
+
+    def draw(self, canvas: ImageDraw.ImageDraw):
+        canvas._image.paste(self.__quantized_image, self.bounds()[:2])
+        logging.debug(f"Draw image on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)}")
+
+    def __quantize_image(self, image: Image.Image):
+        size = (self.x1 - self.x0 + 1, self.y1 - self.y0 + 1)
+        i = image.resize(size)
+        i = i.convert('L')
+        i0 = Image.eval(i, lambda x: x if x < 48 else 0)
+        i1 = Image.eval(i, lambda x: x if x >= 48 and x < 128+32 else 0)
+        i2 = Image.eval(i, lambda x: x if x >= 128+32 and x < 192+16 else 0)
+        i3 = Image.eval(i, lambda x: x if x >= 192+16 else 0)
+        i0b = i0.convert('1', dither=Image.Dither.NONE)
+        i1b = i1.convert('1', dither=Image.Dither.NONE)
+        i2b = i2.convert('1', dither=Image.Dither.NONE)
+        i3b = i3.convert('1', dither=Image.Dither.NONE)
+
+        out = Image.new('L', size, BLACK)
+        d = ImageDraw.Draw(out)
+        d.bitmap((0,0), i1b, GRAY_DARK)
+        d.bitmap((0,0), i2b, GRAY_LIGHT)
+        d.bitmap((0,0), i3b, WHITE)
+        out.show()
+        return out
+
+    def set_image(self, image):
+        self.__image = image
+        self.__quantized_image = self.__quantize_image(image)
+
+
 
 class GUI:
 
