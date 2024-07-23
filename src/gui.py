@@ -154,26 +154,6 @@ class GUIImage(GUIElement):
         self.__quantized_image.show()
 
 
-
-class GUI:
-
-    def builder():
-        return GUI_Builder()
-    
-    # provide interface to other classes to change GUI and initiate re-rendering of GUI 
-    def __init__(self, width, height, elements = None, output = None) -> None:
-        self.__renderer = GUI_Renderer(width, height)
-        self.__elements: List[GUIElement] | None = elements
-        self.output: Output | None = output
-
-    def update(self):
-        self.__renderer.render(self.__elements)
-        try:
-            self.output.show_image(self.__renderer.get_image())
-        except Exception as e:
-            self.output.clean()
-            raise e
-
 class GUI_Renderer:
     # render the actual GUI into a PIL.Image of size WIDTH x HEIGHT
     # handle low lever rendering and provide functions like draw_rectangle() or draw_text()
@@ -182,42 +162,16 @@ class GUI_Renderer:
         self.width = width
         self.height = height
 
-
     def get_image(self):
         return self.__image
     
     def render(self, elements: List[GUIElement]):
         image = Image.new('L', (self.width, self.height), WHITE)
         draw = ImageDraw.Draw(image)
-        for e in elements:
-            e.draw(draw)
+        if len(elements) > 0:
+            for e in elements:
+                e.draw(draw)
         self.__image = image
-
-
-class GUI_Builder:
-
-    def __init__(self) -> None:
-        self.__elements: List[GUIElement] = []
-        self.__output: Output | None = None
-        self.width = None
-        self.height = None
-    
-    def build(self):
-        gui = GUI(self.width, self.height, self.__elements, self.__output)
-        return gui
-
-    def set_output(self, output):
-        self.__output = output
-        return self
-    
-    def set_size(self, width, height):
-        self.width = width
-        self.height = height
-        return self
-
-    def add_element(self, element):
-        self.__elements.append(element)
-        return self
     
 
 
