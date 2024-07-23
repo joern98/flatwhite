@@ -36,7 +36,7 @@ def setup_gui(output):
     b = GUI.builder().set_output(output).set_size(WIDTH, HEIGHT)
 
     textbox_title = Textbox(PAD_X, PAD_Y, WIDTH-PAD_X-1, PAD_Y+77, "...", font=Textbox.LARGE, color=BLACK)
-    textbox_artist = Textbox(PAD_X, PAD_Y+78, WIDTH-PAD_X-1, HEIGHT-PAD_Y-1, "...", font=Textbox.SMALL, color=GRAY_DARK)
+    textbox_artist = Textbox(PAD_X, PAD_Y+78, WIDTH-100-PAD_X-1, HEIGHT-PAD_Y-1, "...", font=Textbox.SMALL, color=GRAY_DARK)
     guiimage_album_art = GUIImage(WIDTH-100-PAD_X, HEIGHT-100-PAD_Y, WIDTH-1-PAD_X, HEIGHT-1-PAD_Y, Image.new('L', (64, 64), GRAY_LIGHT))
     b.add_element(textbox_title).add_element(textbox_artist).add_element(guiimage_album_art)
     return b.build()

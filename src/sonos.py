@@ -43,6 +43,9 @@ class SonosService:
     def on_change(self, callback):
         self.__on_change_callback = callback
 
+    def get_current_track_info(self):
+        return self.__sonos.get_current_track_info()
+
         
     
 
