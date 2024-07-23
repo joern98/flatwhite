@@ -94,8 +94,11 @@ class GUIImage(GUIElement):
             self.set_image(image)
 
     def draw(self, canvas: ImageDraw.ImageDraw):
-        canvas._image.paste(self.__quantized_image, self.bounds()[:2])
-        logging.debug(f"Draw image on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)}")
+        if self.__quantized_image is not None:
+            canvas._image.paste(self.__quantized_image, self.bounds()[:2])
+            logging.debug(f"Draw image on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)}")
+        else:
+            logging.debug("Image is None. Nothing drawn.")
 
     def __quantize_image_v1(self, image: Image.Image):
         size = (self.x1 - self.x0 + 1, self.y1 - self.y0 + 1)

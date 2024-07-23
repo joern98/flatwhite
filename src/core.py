@@ -17,8 +17,10 @@ def main():
 
     output = Output()
     view = CurrentTrackView()
+
     def on_view_change_callback(view: View):
         output.show_image(view.get())
+        
     view.on_change(on_view_change_callback)
     view.init()
 
