@@ -66,7 +66,7 @@ class EPD(Output):
     def partial_update(self, image, bounds):
         try:
             self.epd.init()
-            self.epd.display_Partial(image, bounds[0], bounds[1], bounds[2], bounds[3])
+            self.epd.display_Partial(self.epd.getbuffer(image), bounds[0], bounds[1], bounds[2], bounds[3])
             self.epd.sleep()
         except:
             self.clean()
