@@ -2,9 +2,18 @@ import logging
 import os
 from typing import List
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImagePalette
 
+from .output import Output
 from .constants import RESOURCE_PATH, BLACK, WHITE, GRAY_LIGHT, GRAY_DARK
+
+class GUI_Model:
+
+    def __init__(self) -> None:
+        self.title = "..."
+        self.artist = "..."
+        self.current_timecode_seconds = 0
+        self.track_length_seconds = 0
 
 class GUIElement:
     """Base class for GUIElements"""
@@ -14,7 +23,6 @@ class GUIElement:
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-        self.__has_changed = True
 
     def draw(self, canvas: ImageDraw.ImageDraw):
         """Draw the GUIElement on the given canvas"""
@@ -22,13 +30,6 @@ class GUIElement:
 
     def bounds(self):
         return (self.x0, self.y0, self.x1, self.y1)
-    
-    def has_changed(self):
-        return self.__has_changed
-    
-    def set_changed(self, value = True):
-        self.__has_changed = value
-
 
 class Rectangle(GUIElement):
     def __init__(self, x0, y0, x1, y1, fill=None, border_color=BLACK, border_width=1) -> None:
@@ -50,22 +51,19 @@ class Textbox(GUIElement):
 
     def __init__(self, x0, y0, x1, y1, text, font=LARGE, color=BLACK) -> None:
         super().__init__(x0, y0, x1, y1)
-        self.__text = text
-        self.__font_index = font
-        self.__color = color
+        self.text = text
+        self.font_index = font
+        self.color = color
 
     def draw(self, canvas: ImageDraw.ImageDraw):
         adjusted_text = self.__get_adjusted_text(canvas)
-        canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=self.__color, font=self.__fonts[self.__font_index])
-        logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.__text}' adjusted to {repr(adjusted_text)}")
+        canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=self.color, font=self.__fonts[self.font_index])
+        logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.text}' adjusted to {repr(adjusted_text)}")
 
-    def set_text(self, text):
-        self.__text = text
-        self.set_changed()
 
     def __get_max_line_length(self, text, canvas: ImageDraw.ImageDraw):
         i = 0
-        while canvas.textbbox(self.bounds()[:2], text[:i], font=self.__fonts[self.__font_index])[2] <= self.x1 and i < len(text):
+        while canvas.textbbox(self.bounds()[:2], text[:i], font=self.__fonts[self.font_index])[2] <= self.x1 and i < len(text):
             i += 1
         return i
     
@@ -75,9 +73,9 @@ class Textbox(GUIElement):
                 return i
             
     def __get_adjusted_text(self, canvas: ImageDraw.ImageDraw):
-        a, b = "", self.__text
-        max_line_length = self.__get_max_line_length(self.__text, canvas)
-        while canvas.multiline_textbbox(self.bounds()[:2], b, font=self.__fonts[self.__font_index])[2] > self.x1:
+        a, b = "", self.text
+        max_line_length = self.__get_max_line_length(self.text, canvas)
+        while canvas.multiline_textbbox(self.bounds()[:2], b, font=self.__fonts[self.font_index])[2] > self.x1:
             new_line_pos = self.__find_previous_space_index(b, max_line_length)
             a += b[:new_line_pos]
             a += '\n' 
@@ -157,28 +155,26 @@ class GUIImage(GUIElement):
         self.__quantized_image = self.__quantize_image_v3(image)
         self.__image.show()
         self.__quantized_image.show()
-        self.set_changed()
 
 
 class GUI_Renderer:
     # render the actual GUI into a PIL.Image of size WIDTH x HEIGHT
     # handle low lever rendering and provide functions like draw_rectangle() or draw_text()
     def __init__(self, width, height) -> None:
+        self.__image = None
         self.width = width
         self.height = height
+
+    def get_image(self):
+        return self.__image
     
     def render(self, elements: List[GUIElement]):
         image = Image.new('L', (self.width, self.height), WHITE)
         draw = ImageDraw.Draw(image)
-        changed_regions = []
-
         if len(elements) > 0:
             for e in elements:
                 e.draw(draw)
-                if e.has_changed():
-                    changed_regions.append(e.bounds())
-                    e.set_changed(False)
-        return image, changed_regions
+        self.__image = image
     
 
 

@@ -19,11 +19,7 @@ def main():
     view = CurrentTrackView()
 
     def on_view_change_callback(view: View):
-        image, changed_regions = view.get()
-        if len(changed_regions) > 1:
-            output.show_image(image)
-        else:
-            output.partial_update(image, changed_regions[0])
+        output.show_image(view.get())
         
     view.on_change(on_view_change_callback)
     view.init()
