@@ -17,8 +17,8 @@ class View:
         self._on_change_callback = None
 
     def get(self) -> Image.Image:
-        self.__renderer.render(self._elements)
-        return self.__renderer.get_image()
+        image, changed_regions = self.__renderer.render(self._elements)
+        return image, changed_regions
     
     def on_change(self, callback):
         self._on_change_callback = callback
@@ -45,18 +45,18 @@ class CurrentTrackView(View):
         self.__sonos_service = SonosService()
         self.__sonos_service.on_change(self.sonos_change_callback)
     	
-        #self.__position_task = task.LoopingCall(self.update_track_position)
-        #self.__position_task.start(5.0)
+        self.__position_task = task.LoopingCall(self.update_track_position)
+        self.__position_task.start(5.0)
 
     def update_track_position(self):
         current_track_info = self.__sonos_service.get_current_track_info()
         pos = current_track_info["position"]
-        self.__textbox_position.text = pos
+        self.__textbox_position.set_text(pos)
         self._changed()
 
     def sonos_change_callback(self, payload: TrackDataPayload):
-        self.__textbox_title.text = payload.title
-        self.__textbox_artist.text = payload.artist
+        self.__textbox_title.set_text(payload.title)
+        self.__textbox_artist.set_text(payload.artist)
         album_art_response = requests.get(payload.album_art_uri)
         album_art = Image.open(BytesIO(album_art_response.content))
         self.__image_album_art.set_image(album_art)

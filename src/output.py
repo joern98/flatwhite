@@ -37,6 +37,9 @@ class ImageShow(Output):
     def show_image(self, image: Image.Image):
         image.show(f"ImageShow, {self.width}x{self.height}")
 
+    def partial_update(self, image, bounds):
+        self.show_image(image)
+
 
 # EPD (E-Paper Display) output
 class EPD(Output):
@@ -55,6 +58,15 @@ class EPD(Output):
             self.epd.init()
             self.epd.Init_4Gray()
             self.epd.display_4Gray(self.epd.getbuffer_4Gray(image))
+            self.epd.sleep()
+        except:
+            self.clean()
+            raise
+
+    def partial_update(self, image, bounds):
+        try:
+            self.epd.init_Fast()
+            self.epd.display_Partial(image, bounds[0], bounds[1], bounds[2], bounds[3])
             self.epd.sleep()
         except:
             self.clean()
