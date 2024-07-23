@@ -17,7 +17,6 @@ if platform.system() == "Linux":
 elif platform.system() in ["Windows", "Darwin"]:
     from .output import ImageShow as Output
 
-logging.basicConfig(level=logging.DEBUG, filename="flatwhite_log.txt", filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 
 logging.debug(f"RESOURCE_PATH = {RESOURCE_PATH}")
 
@@ -54,7 +53,6 @@ def main():
         textbox_artist.text = payload.artist
         album_art_response = requests.get(payload.album_art_uri)
         album_art = Image.open(BytesIO(album_art_response.content))
-        album_art.show()
         guiimage_album_art.set_image(album_art)
         gui.update()
         
