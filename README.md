@@ -1,6 +1,6 @@
 # Flatwhite
 
-Small e-ink display application for varoius purposes
+Small e-ink display application for various purposes
 
 ### Current views:
 
@@ -9,3 +9,8 @@ Small e-ink display application for varoius purposes
 
 ### Author
 - Joern Eggersgluess
+
+
+### References
+
+- Weather Icons: https://github.com/erikflowers/weather-icons
