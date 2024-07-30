@@ -5,7 +5,7 @@ from twisted.internet import reactor
 
 from .constants import RESOURCE_PATH, BLACK, GRAY_DARK, GRAY_LIGHT, WHITE
 from .input import KEY1_PRESSED, KEY2_PRESSED
-from .views import CurrentTrackView, View
+from .views import CurrentTrackView, View, WeatherView
 
 if platform.system() == "Linux":
     from .output import EPD as Output
@@ -16,13 +16,14 @@ def main():
     KEY1_PRESSED.subscribe(reactor.stop)
 
     output = Output()
-    view = CurrentTrackView()
+    #view = CurrentTrackView()
+    view = WeatherView()
 
     def on_view_change_callback(view: View):
         output.show_image(view.get())
         
     view.on_change(on_view_change_callback)
-    view.init()
+    view.initialize()
 
 
 

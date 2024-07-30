@@ -1,9 +1,13 @@
 from io import BytesIO
+import json
+import logging
 import requests
 
 
 from PIL import Image
 from twisted.internet import reactor, task
+
+from  .weather import WeatherService
 
 from .gui import Textbox, GUIImage, GUI_Renderer
 from .constants import RESOURCE_PATH, BLACK, GRAY_DARK, GRAY_LIGHT, WHITE, WIDTH, HEIGHT
@@ -41,7 +45,7 @@ class CurrentTrackView(View):
         self._elements.extend([self.__textbox_artist, self.__textbox_title, self.__image_album_art, self.__textbox_position])
 
 
-    def init(self):
+    def initialize(self):
         self.__sonos_service = SonosService()
         self.__sonos_service.on_change(self.sonos_change_callback)
     	
@@ -61,3 +65,14 @@ class CurrentTrackView(View):
         album_art = Image.open(BytesIO(album_art_response.content))
         self.__image_album_art.set_image(album_art)
         self._changed()
+
+
+class WeatherView(View):
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def initialize(self):
+        self.__weather_sevice = WeatherService()
+        weather = self.__weather_sevice.get_current_weather()
+        logging.debug(json.dumps(weather, indent=2))
