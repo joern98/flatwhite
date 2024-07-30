@@ -1,15 +1,14 @@
 from io import BytesIO
-import json
 import logging
 import requests
-
+import datetime
 
 from PIL import Image
 from twisted.internet import reactor, task
 
 from  .weather import WeatherService
 
-from .gui import Textbox, GUIImage, GUI_Renderer
+from .gui import Textbox, GUIImage, GUI_Renderer, Line
 from .constants import RESOURCE_PATH, BLACK, GRAY_DARK, GRAY_LIGHT, WHITE, WIDTH, HEIGHT
 from .sonos import SonosService, TrackDataPayload
 
@@ -68,11 +67,32 @@ class CurrentTrackView(View):
 
 
 class WeatherView(View):
+    HALF_HEIGHT = HEIGHT//2
+    PADDING = 2
 
     def __init__(self) -> None:
         super().__init__()
+        self.__separator = Line(0, self.HALF_HEIGHT, WIDTH-1, self.HALF_HEIGHT)
+        self.__current_temperature = Textbox(self.PADDING, self.PADDING, WIDTH-1-self.PADDING, self.PADDING + 20, "xx °C")
+        self.__next_temperature_max = Textbox(self.PADDING, self.HALF_HEIGHT + self.PADDING, WIDTH-1-self.PADDING, self.PADDING + 20, "xx °C")
+        self.__next_temperature_min = Textbox(self.PADDING, self.HALF_HEIGHT + self.PADDING + 26, WIDTH-1-self.PADDING, self.HALF_HEIGHT + self.PADDING + 46, "xx °C", font=Textbox.SMALL)
+        self.__next_date = Textbox(2*WIDTH//3, self.PADDING + self.HALF_HEIGHT, WIDTH-1, self.PADDING + self.HALF_HEIGHT + 20, "2024-07-31", font=Textbox.SMALL)
+
+        self._elements.extend([self.__separator, self.__current_temperature, self.__next_temperature_max, self.__next_temperature_min, self.__next_date])
+
 
     def initialize(self):
         self.__weather_sevice = WeatherService()
         weather = self.__weather_sevice.get_current_weather()
-        logging.debug(json.dumps(weather, indent=2))
+        temperature_unit_str = weather["current_units"]["temperature_2m"]
+        self.__current_temperature.text = str(weather["current"]["temperature_2m"]) + ' ' + temperature_unit_str
+
+        current_time = datetime.datetime.now()
+        # only flip to actual next day after 7am
+        next_day_index = 0 if current_time.hour < 7 else 1
+        logging.info(f"Displaying weather forecast for {weather['daily']['time'][next_day_index]}")
+        self.__next_temperature_max.text = str(weather["daily"]["temperature_2m_max"][next_day_index]) + ' ' + temperature_unit_str
+        self.__next_temperature_min.text = str(weather["daily"]["temperature_2m_min"][next_day_index]) + ' ' + temperature_unit_str
+        iso_date = datetime.date.fromisoformat(weather['daily']['time'][next_day_index])
+        self.__next_date.text = iso_date.strftime("%d/%m/%Y")
+        self._changed()

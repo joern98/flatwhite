@@ -15,7 +15,7 @@ class GUI_Model:
         self.current_timecode_seconds = 0
         self.track_length_seconds = 0
 
-class GUIElement:
+class GUI_Element:
     """Base class for GUIElements"""
 
     def __init__(self, x0, y0, x1, y1) -> None:
@@ -30,8 +30,19 @@ class GUIElement:
 
     def bounds(self):
         return (self.x0, self.y0, self.x1, self.y1)
+    
+class Line(GUI_Element):
 
-class Rectangle(GUIElement):
+    def __init__(self, x0, y0, x1, y1, color=BLACK, width=1) -> None:
+        super().__init__(x0, y0, x1, y1)
+        self.color = color
+        self.width = width
+
+    def draw(self, canvas: ImageDraw.ImageDraw):
+        canvas.line(self.bounds(), self.color, self.width)
+        logging.debug(f"Draw line on canvas from {self.bounds()[:2]} to {self.bounds()[2:]} with width {self.width} and color {self.color}")
+
+class Rectangle(GUI_Element):
     def __init__(self, x0, y0, x1, y1, fill=None, border_color=BLACK, border_width=1) -> None:
         super().__init__(x0, y0, x1, y1)
         self.fill = fill
@@ -42,7 +53,7 @@ class Rectangle(GUIElement):
         canvas.rectangle((self.x0, self.y0, self.x1, self.y1), fill=self.fill, outline=self.border_color, width=self.border_width)
         logging.debug(f"Draw rectangle on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)}")
 
-class Textbox(GUIElement):
+class Textbox(GUI_Element):
 
     __fonts = [ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 24), 
                ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 18)]
@@ -83,7 +94,7 @@ class Textbox(GUIElement):
         a += b
         return a
     
-class GUIImage(GUIElement):
+class GUIImage(GUI_Element):
 
 
     def __init__(self, x0, y0, x1, y1, image: Image.Image | None = None) -> None:
@@ -168,7 +179,7 @@ class GUI_Renderer:
     def get_image(self):
         return self.__image
     
-    def render(self, elements: List[GUIElement]):
+    def render(self, elements: List[GUI_Element]):
         image = Image.new('L', (self.width, self.height), WHITE)
         draw = ImageDraw.Draw(image)
         if len(elements) > 0:
