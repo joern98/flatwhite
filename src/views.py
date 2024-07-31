@@ -80,15 +80,16 @@ class WeatherView(View):
 
         self._elements.extend([self.__separator, self.__current_temperature, self.__next_temperature_max, self.__next_temperature_min, self.__next_date])
 
-
     def initialize(self):
         self.__weather_sevice = WeatherService()
+
+    def update(self):
         weather = self.__weather_sevice.get_current_weather()
         temperature_unit_str = weather["current_units"]["temperature_2m"]
         self.__current_temperature.text = str(weather["current"]["temperature_2m"]) + ' ' + temperature_unit_str
 
-        current_time = datetime.datetime.now()
         # only flip to actual next day after 7am
+        current_time = datetime.datetime.now()
         next_day_index = 0 if current_time.hour < 7 else 1
         logging.info(f"Displaying weather forecast for {weather['daily']['time'][next_day_index]}")
         self.__next_temperature_max.text = str(weather["daily"]["temperature_2m_max"][next_day_index]) + ' ' + temperature_unit_str
@@ -96,3 +97,4 @@ class WeatherView(View):
         iso_date = datetime.date.fromisoformat(weather['daily']['time'][next_day_index])
         self.__next_date.text = iso_date.strftime("%d/%m/%Y")
         self._changed()
+        
