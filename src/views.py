@@ -39,27 +39,28 @@ class CurrentTrackView(View):
         self.__textbox_title = Textbox(0, 0, WIDTH-1, 77, "...", font=Textbox.LARGE, color=BLACK)
         self.__textbox_artist = Textbox(0, 78, WIDTH-100-1, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_DARK)
         self.__image_album_art = GUIImage(WIDTH-100-0, HEIGHT-100, WIDTH-1, HEIGHT-1)
-        self.__textbox_position = Textbox(0, HEIGHT-20, WIDTH-100-1, HEIGHT-1, "00:00:00", font=Textbox.SMALL, color=BLACK)
+        self.__separator = Line(0, HEIGHT-42, WIDTH-1, HEIGHT-42, color=GRAY_DARK)
+        self.__next_title = Textbox(0, HEIGHT-40, WIDTH-100, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_DARK)
+        self.__next_artist = Textbox(0, HEIGHT-20, WIDTH-100, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_LIGHT)
         
-        self._elements.extend([self.__textbox_artist, self.__textbox_title, self.__image_album_art, self.__textbox_position])
-
+        self._elements.extend([
+            self.__textbox_artist,
+            self.__textbox_title,
+            self.__separator,
+            self.__image_album_art, 
+            self.__next_title, 
+            self.__next_artist
+        ])
 
     def initialize(self):
         self.__sonos_service = SonosService()
         self.__sonos_service.on_change(self.sonos_change_callback)
     	
-        #self.__position_task = task.LoopingCall(self.update_track_position)
-        #self.__position_task.start(5.0)
-
-    def update_track_position(self):
-        current_track_info = self.__sonos_service.get_current_track_info()
-        pos = current_track_info["position"]
-        self.__textbox_position.text = pos
-        self._changed()
-
     def sonos_change_callback(self, payload: TrackDataPayload):
         self.__textbox_title.text = payload.title
         self.__textbox_artist.text = payload.artist
+        self.__next_title.text = payload.next_title
+        self.__next_artist.text = payload.next_artist
         album_art_response = requests.get(payload.album_art_uri)
         album_art = Image.open(BytesIO(album_art_response.content))
         self.__image_album_art.set_image(album_art)
@@ -78,10 +79,17 @@ class WeatherView(View):
         self.__next_temperature_min = Textbox(self.PADDING, self.HALF_HEIGHT + self.PADDING + 26, WIDTH-1-self.PADDING, self.HALF_HEIGHT + self.PADDING + 46, "xx °C", font=Textbox.SMALL)
         self.__next_date = Textbox(2*WIDTH//3, self.PADDING + self.HALF_HEIGHT, WIDTH-1, self.PADDING + self.HALF_HEIGHT + 20, "2024-07-31", font=Textbox.SMALL)
 
-        self._elements.extend([self.__separator, self.__current_temperature, self.__next_temperature_max, self.__next_temperature_min, self.__next_date])
+        self._elements.extend([
+            self.__separator, 
+            self.__current_temperature, 
+            self.__next_temperature_max, 
+            self.__next_temperature_min, 
+            self.__next_date
+        ])
 
     def initialize(self):
         self.__weather_sevice = WeatherService()
+        self.update()
 
     def update(self):
         weather = self.__weather_sevice.get_current_weather()

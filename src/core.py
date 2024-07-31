@@ -11,28 +11,46 @@ if platform.system() == "Linux":
     from .output import EPD as Output
 elif platform.system() in ["Windows", "Darwin"]:
     from .output import ImageShow as Output
-     
-def main():
 
-    output = Output()
+class FlatwhiteCore:
 
-    current_track_view = CurrentTrackView()
-    current_track_view.initialize()
-    weather_view = WeatherView()
-    weather_view.initialize()
+    def __init__(self) -> None:
+        self.__output = Output()
 
-    def change_to_view(view: View):
-        return lambda: output.show_image(view.get())
+        self.__current_track_view = CurrentTrackView()
+        self.__current_track_view.initialize()
+        self.__current_track_view.on_change(self.__on_view_change)
+        self.__weather_view = WeatherView()
+        self.__weather_view.initialize()
+        self.__weather_view.on_change(self.__on_view_change)
+
+        self.__active_view = None
+
+        KEY1_PRESSED.subscribe(self.__change_to_view_fn(self.__current_track_view))
+        KEY2_PRESSED.subscribe(self.__change_to_view_fn(self.__weather_view))
+
+        self.__change_to_view_fn(self.__weather_view)()
+
+    def __change_to_view_fn(self, view: View):
+        self.__active_view = view
+        return lambda: self.__output.show_image(view.get())
     
-    KEY1_PRESSED.subscribe(change_to_view(current_track_view))
-    KEY2_PRESSED.subscribe(change_to_view(weather_view))
+    def __on_view_change(self, view: View):
+        if view == self.__active_view:
+            self.__output.show_image(view.get())
+
+    def exit(self):
+        self.__output.clear()
+        self.__output.clean()
+     
+    
+def main():
+    
+    flatwhite_core = FlatwhiteCore()
 
     KEY4_PRESSED.subscribe(reactor.stop)
 
-    change_to_view(weather_view)()
-
     def before_shutdown():
-        output.clear()
-        output.clean()
+        flatwhite_core.exit()
 
     reactor.addSystemEventTrigger("before", "shutdown", before_shutdown)

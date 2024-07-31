@@ -13,6 +13,8 @@ class TrackDataPayload:
     artist: str
     album: str
     album_art_uri: str
+    next_title: str
+    next_artist: str
 
 class SonosService:
 
@@ -37,7 +39,15 @@ class SonosService:
         self.__current_track_uri = event.variables["current_track_uri"]
 
         track_meta_data = event.variables["current_track_meta_data"]
-        payload = TrackDataPayload(track_meta_data.title, track_meta_data.creator, track_meta_data.album, track_meta_data.album_art_uri)
+        next_track_meta_data = event.variables["next_track_meta_data"]
+        payload = TrackDataPayload(
+            track_meta_data.title,
+            track_meta_data.creator,
+            track_meta_data.album,
+            track_meta_data.album_art_uri,
+            next_track_meta_data.title, 
+            next_track_meta_data.creator)
+        
         self.__on_change_callback(payload)
 
     def on_change(self, callback):
