@@ -1,5 +1,9 @@
 import logging
-from threading import Thread
+import sys
+from threading import Thread, current_thread
+import time
+from twisted.internet import reactor
+from io import StringIO
 
 
 class Observable:
@@ -22,6 +26,11 @@ KEY2_PRESSED = Observable()
 KEY3_PRESSED = Observable()
 KEY4_PRESSED = Observable()
 
+KEY1_PRESSED.subscribe(lambda: logging.debug("KEY1 pressed!"))
+KEY2_PRESSED.subscribe(lambda: logging.debug("KEY2 pressed!"))
+KEY3_PRESSED.subscribe(lambda: logging.debug("KEY3 pressed!"))
+KEY4_PRESSED.subscribe(lambda: logging.debug("KEY4 pressed!"))
+
 try:
     from gpiozero import Button
 
@@ -41,10 +50,32 @@ try:
     __BUTTON_KEY3.when_pressed = KEY3_PRESSED.notify
     __BUTTON_KEY4.when_pressed = KEY4_PRESSED.notify
 
-    KEY1_PRESSED.subscribe(lambda: logging.debug("KEY1 pressed!"))
-    KEY2_PRESSED.subscribe(lambda: logging.debug("KEY2 pressed!"))
-    KEY3_PRESSED.subscribe(lambda: logging.debug("KEY3 pressed!"))
-    KEY4_PRESSED.subscribe(lambda: logging.debug("KEY4 pressed!"))
 
 except:
     logging.warning("Failed to import gpiozero, Buttons will not work!")
+    logging.info("Setting up alternative button emulation, input '1', '2', '3' or '4' into the terminal window")
+
+    __run = True
+    def get_input():
+        global __run
+        while __run:
+            x = sys.stdin.read(1)
+            if x == "1":
+                KEY1_PRESSED.notify()
+            elif x == "2":
+                KEY2_PRESSED.notify()
+            elif x == "3":
+                KEY3_PRESSED.notify()
+            elif x == "4":
+                KEY4_PRESSED.notify()
+
+    t = Thread(target=get_input, daemon=True)
+    t.start()
+
+    def stop_thread():
+        logging.debug("Stopping input thread")
+        global __run
+        __run = False
+
+reactor.addSystemEventTrigger("before", "shutdown", stop_thread)
+

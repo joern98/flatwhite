@@ -52,5 +52,6 @@ def main():
 
     def before_shutdown():
         flatwhite_core.exit()
+        KEY4_PRESSED.unsubscribe(reactor.stop)
 
     reactor.addSystemEventTrigger("before", "shutdown", before_shutdown)
