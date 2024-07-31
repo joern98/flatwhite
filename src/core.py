@@ -4,7 +4,7 @@ import platform
 from twisted.internet import reactor
 
 from .constants import RESOURCE_PATH, BLACK, GRAY_DARK, GRAY_LIGHT, WHITE
-from .input import KEY1_PRESSED, KEY2_PRESSED
+from .input import KEY1_PRESSED, KEY2_PRESSED, KEY3_PRESSED
 from .views import CurrentTrackView, View, WeatherView
 
 if platform.system() == "Linux":
@@ -25,7 +25,7 @@ def main():
         return lambda: output.show_image(view.get())
     
     KEY2_PRESSED.subscribe(change_to_view(current_track_view))
-    KEY2_PRESSED.subscribe(change_to_view(weather_view))
+    KEY3_PRESSED.subscribe(change_to_view(weather_view))
 
     KEY1_PRESSED.subscribe(reactor.stop)
 
