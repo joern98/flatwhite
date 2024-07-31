@@ -164,8 +164,8 @@ class GUIImage(GUI_Element):
     def set_image(self, image: Image.Image):
         self.__image = image
         self.__quantized_image = self.__quantize_image_v3(image)
-        self.__image.show()
-        self.__quantized_image.show()
+        #self.__image.show()
+        #self.__quantized_image.show()
 
 
 class GUI_Renderer:

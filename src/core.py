@@ -13,19 +13,23 @@ elif platform.system() in ["Windows", "Darwin"]:
     from .output import ImageShow as Output
      
 def main():
-    KEY1_PRESSED.subscribe(reactor.stop)
 
     output = Output()
-    #view = CurrentTrackView()
-    view = WeatherView()
 
-    def on_view_change_callback(view: View):
-        output.show_image(view.get())
-        
-    view.on_change(on_view_change_callback)
-    view.initialize()
+    current_track_view = CurrentTrackView()
+    current_track_view.initialize()
+    weather_view = WeatherView()
+    weather_view.initialize()
 
+    def change_to_view(view: View):
+        return lambda: output.show_image(view.get())
+    
+    KEY2_PRESSED.subscribe(change_to_view(current_track_view))
+    KEY2_PRESSED.subscribe(change_to_view(weather_view))
 
+    KEY1_PRESSED.subscribe(reactor.stop)
+
+    change_to_view(weather_view)()
 
     def before_shutdown():
         output.clear()
