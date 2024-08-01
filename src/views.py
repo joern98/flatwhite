@@ -114,13 +114,27 @@ class FontCheckerView(View):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__textbox = Textbox(2,2,WIDTH-3, HEIGHT-3, "ABCDEFGHIJ KLMNOPQRST UVWXYZÄÖÜß 1234567890 !?.,-_+#°:;=%", font=Textbox.LARGE, color=GRAY_LIGHT)
+        test_string = "ABCDEFGHIJ KLMNOPQRST UVWXYZÄÖÜß 1234567890 !?.,-_+#°:;=%"
+        self.__scene_index = 0
+        self.__scenes = {
+            "LARGE, black": Textbox(2,2,WIDTH-3, HEIGHT-3, test_string, font=Textbox.LARGE, color=BLACK),
+            "LARGE, dark gray": Textbox(2,2,WIDTH-3, HEIGHT-3, test_string, font=Textbox.LARGE, color=GRAY_DARK),
+            "LARGE, light gray": Textbox(2,2,WIDTH-3, HEIGHT-3, test_string, font=Textbox.LARGE, color=GRAY_LIGHT),
+            "SMALL, black": Textbox(2,2,WIDTH-3, HEIGHT-3, test_string, font=Textbox.SMALL, color=BLACK),
+            "SMALL, dark gray": Textbox(2,2,WIDTH-3, HEIGHT-3, test_string, font=Textbox.SMALL, color=GRAY_DARK),
+            "SMALL, light gray": Textbox(2,2,WIDTH-3, HEIGHT-3, test_string, font=Textbox.SMALL, color=GRAY_LIGHT),
+        }
+        self.__scene_name_textbox = Textbox(WIDTH//2, HEIGHT-25, WIDTH-1, HEIGHT-1, list(self.__scenes.keys())[self.__scene_index], font=Textbox.SMALL, wrap=False)
 
-        self._elements.append(self.__textbox)
+        self._elements.append(self.__scenes[list(self.__scenes.keys())[self.__scene_index]])
+        self._elements.append(self.__scene_name_textbox)
 
     def initialize(self):
         def f():
-            self.__textbox.font_index = Textbox.LARGE if self.__textbox.font_index == Textbox.SMALL else Textbox.SMALL
+            self.__scene_index = (self.__scene_index + 1) % len(self.__scenes)
+            scene_key = list(self.__scenes.keys())[self.__scene_index]
+            self._elements[0] = self.__scenes[scene_key]
+            self.__scene_name_textbox.text = scene_key
             self._changed()
 
         self.__interval_change_size = task.LoopingCall(f)
