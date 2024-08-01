@@ -37,8 +37,8 @@ class FlatwhiteCore:
         
     def __change_to_view_fn(self, view: View):
         def impl():
-            self.__active_view = view
-            self.__show(view.get())
+            if self.__show(view.get()):
+                self.__active_view = view
 
         return impl 
     
@@ -48,8 +48,10 @@ class FlatwhiteCore:
             self.__show(view.get())
 
     def __show(self, image):
-        self.__output.show_image(image, force_binary=True)
+        return self.__output.show_image(image, force_binary=True)
+
     def exit(self):
+        self.__active_view = None
         self.__output.clear()
         self.__output.clean()
      

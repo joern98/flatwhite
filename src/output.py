@@ -18,8 +18,8 @@ class Output:
     def size(self):
         return (self.width, self.height)
     
-    def show_image(self, image: Image.Image, force_binary=False):
-        pass
+    def show_image(self, image: Image.Image, force_binary=False) -> bool:
+        return False
 
     def clear(self):
         pass
@@ -33,10 +33,11 @@ class ImageShow(Output):
     def __init__(self, width = 264, height = 176) -> None:
         super().__init__(width, height)
 
-    def show_image(self, image: Image.Image, force_binary=False):
+    def show_image(self, image: Image.Image, force_binary=False) -> bool:
         if force_binary:
             image = image.point(lambda x: 255 if x > 248 else 0, '1')
         image.show(f"ImageShow, {self.width}x{self.height}")
+        return True
 
 
 # EPD (E-Paper Display) output
@@ -53,22 +54,26 @@ class EPD(Output):
         super().__init__(self.epd.height, self.epd.width)
 
     def show_image(self, image: Image.Image, force_binary=False):
+        success = False
         if not self.__lock:
             self.__lock = True
             try:
                 if image.mode == '1' or force_binary:
                     self.__show_image_binary(image)
+                    success = True
                 elif image.mode == 'L':
                     self.__show_image_greyscale(image)
+                    success = True
                 else:
                     logging.error("Image mode '{image.mode}' not supported!")
-                    
+                
             except:
                 self.clean()
                 logging.error("An error occured during image display!")
-                
+
             finally:
                 self.__lock = False
+        return success
 
     def __show_image_greyscale(self, image: Image.Image):
         try:
