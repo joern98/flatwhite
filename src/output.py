@@ -74,7 +74,7 @@ class EPD(Output):
 
     def __show_image_binary(self, image: Image.Image):
         try:
-            self.epd.init()
+            self.epd.init_Fast()
             self.epd.display_Fast(self.epd.getbuffer(image))
             self.epd.sleep()
         except:
