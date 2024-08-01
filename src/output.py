@@ -55,7 +55,7 @@ class EPD(Output):
 
     def show_image(self, image: Image.Image, force_binary=False):
         success = False
-        logging.debug(f"EPD is locked: {self.__lock}")
+        logging.debug(f"EPD is locked for {image.__repr__()}: {self.__lock}")
         if not self.__lock:
             self.__lock = True
             try:
@@ -66,15 +66,15 @@ class EPD(Output):
                     self.__show_image_greyscale(image)
                     success = True
                 else:
-                    logging.error("Image mode '{image.mode}' not supported!")
+                    logging.error(f"Image mode not supported for {image.__repr__()}!")
                 
             except:
                 self.clean()
-                logging.error("An error occured during image display!")
+                logging.error(f"An error occured during image display of {image.__repr__()}!")
 
             finally:
                 self.__lock = False
-        logging.debug(f"EPD show_image was successful: {success}")
+        logging.debug(f"EPD show_image was successful for {image.__repr__()}: {success}")
         return success
 
     def __show_image_greyscale(self, image: Image.Image):
