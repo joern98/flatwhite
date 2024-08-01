@@ -55,6 +55,7 @@ class EPD(Output):
 
     def show_image(self, image: Image.Image, force_binary=False):
         success = False
+        logging.debug(f"EPD is locked: {self.__lock}")
         if not self.__lock:
             self.__lock = True
             try:
@@ -73,6 +74,7 @@ class EPD(Output):
 
             finally:
                 self.__lock = False
+        logging.debug(f"EPD show_image was successful: {success}")
         return success
 
     def __show_image_greyscale(self, image: Image.Image):
