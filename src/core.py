@@ -32,10 +32,16 @@ class FlatwhiteCore:
         self.__change_to_view_fn(self.__weather_view)()
 
     def __change_to_view_fn(self, view: View):
-        self.__active_view = view
-        return lambda: self.__output.show_image(view.get())
+        def impl():
+            self.__active_view = view
+            self.__output.show_image(view.get())
+            
+        return impl 
+            
+    
     
     def __on_view_change(self, view: View):
+        logging.debug(f"on_view_change called from view {view}")
         if view == self.__active_view:
             self.__output.show_image(view.get())
 

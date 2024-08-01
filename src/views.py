@@ -40,8 +40,8 @@ class CurrentTrackView(View):
         self.__textbox_artist = Textbox(0, 78, WIDTH-100-1, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_DARK)
         self.__image_album_art = GUIImage(WIDTH-100-0, HEIGHT-100, WIDTH-1, HEIGHT-1)
         self.__separator = Line(0, HEIGHT-42, WIDTH-1, HEIGHT-42, color=GRAY_DARK)
-        self.__next_title = Textbox(0, HEIGHT-40, WIDTH-100, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_DARK)
-        self.__next_artist = Textbox(0, HEIGHT-20, WIDTH-100, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_LIGHT)
+        self.__next_title = Textbox(0, HEIGHT-40, WIDTH-100, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_DARK, wrap=False)
+        self.__next_artist = Textbox(0, HEIGHT-20, WIDTH-100, HEIGHT-1, "...", font=Textbox.SMALL, color=GRAY_LIGHT, wrap=False)
         
         self._elements.extend([
             self.__textbox_artist,

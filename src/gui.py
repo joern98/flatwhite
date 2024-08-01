@@ -60,17 +60,23 @@ class Textbox(GUI_Element):
     LARGE = 0
     SMALL = 1
 
-    def __init__(self, x0, y0, x1, y1, text, font=LARGE, color=BLACK) -> None:
+    def __init__(self, x0, y0, x1, y1, text, font=LARGE, color=BLACK, wrap=True) -> None:
         super().__init__(x0, y0, x1, y1)
         self.text = text
         self.font_index = font
         self.color = color
+        self.wrap = wrap
 
     def draw(self, canvas: ImageDraw.ImageDraw):
-        adjusted_text = self.__get_adjusted_text(canvas)
+        adjusted_text = self.__get_wrapped_text(canvas) if self.wrap else self.__get_truncated_text(canvas)
         canvas.multiline_text(self.bounds()[:2], adjusted_text, fill=self.color, font=self.__fonts[self.font_index])
         logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.text}' adjusted to {repr(adjusted_text)}")
 
+    def __get_truncated_text(self, canvas: ImageDraw.ImageDraw):
+        line_length = self.__get_max_line_length(self.text, canvas)
+        if line_length < len(self.text):
+            return self.text[:line_length-1] + '...'
+        return self.text
 
     def __get_max_line_length(self, text, canvas: ImageDraw.ImageDraw):
         i = 0
@@ -79,11 +85,12 @@ class Textbox(GUI_Element):
         return i
     
     def __find_previous_space_index(self, text, start):
+        start = start if start < len(text) else len(text)-1
         for i in range(start, 0, -1):
             if text[i] == ' ':
                 return i
             
-    def __get_adjusted_text(self, canvas: ImageDraw.ImageDraw):
+    def __get_wrapped_text(self, canvas: ImageDraw.ImageDraw):
         a, b = "", self.text
         max_line_length = self.__get_max_line_length(self.text, canvas)
         while canvas.multiline_textbbox(self.bounds()[:2], b, font=self.__fonts[self.font_index])[2] > self.x1:
