@@ -44,13 +44,14 @@ class FlatwhiteCore:
     
     
     def __on_view_change(self, view: View):
-        logging.debug(f"on_view_change called from view {view}")
         if view == self.__active_view:
             self.__show(view.get())
 
     def __show(self, image):
-        self.__output.show_image(image, force_binary=True)
-
+        if not self.__output.is_busy():
+            self.__output.show_image(image, force_binary=True)
+        else:
+            logging.error("Output is busy.")
     def exit(self):
         self.__output.clear()
         self.__output.clean()
