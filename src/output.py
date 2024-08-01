@@ -27,9 +27,6 @@ class Output:
     def clean(self):
         pass
 
-    def is_busy(self):
-        return False
-
 # ImageShow output display for debuggung purposes, using PIL.Image.show()
 class ImageShow(Output):
 
@@ -94,9 +91,6 @@ class EPD(Output):
         except:
             self.clean()
             raise
-
-    def is_busy(self):
-        return epd2in7_V2.epdconfig.digital_read(self.epd.busy_pin) == 0
 
     def clean(self):
         logging.debug("Calling module_exit() for cleanup")

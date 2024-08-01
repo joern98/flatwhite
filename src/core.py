@@ -48,10 +48,7 @@ class FlatwhiteCore:
             self.__show(view.get())
 
     def __show(self, image):
-        if not self.__output.is_busy():
-            self.__output.show_image(image, force_binary=True)
-        else:
-            logging.error("Output is busy!")
+        self.__output.show_image(image, force_binary=True)
     def exit(self):
         self.__output.clear()
         self.__output.clean()
