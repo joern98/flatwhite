@@ -49,20 +49,26 @@ class EPD(Output):
             logging.critical("Failed to create EPD class!")
             logging.debug(e)
 
+        self.__lock = False
         super().__init__(self.epd.height, self.epd.width)
 
     def show_image(self, image: Image.Image, force_binary=False):
-        try:
-            if image.mode == '1' or force_binary:
-                self.__show_image_binary(image)
-            elif image.mode == 'L':
-                self.__show_image_greyscale(image)
-            else:
-                logging.error("Image mode '{image.mode}' not supported!")
+        if not self.__lock:
+            self.__lock = True
+            try:
+                if image.mode == '1' or force_binary:
+                    self.__show_image_binary(image)
+                elif image.mode == 'L':
+                    self.__show_image_greyscale(image)
+                else:
+                    logging.error("Image mode '{image.mode}' not supported!")
+                    
+            except:
+                self.clean()
+                logging.error("An error occured during image display!")
                 
-        except:
-            self.clean()
-            logging.error("An error occured during image display!")
+            finally:
+                self.__lock = False
 
     def __show_image_greyscale(self, image: Image.Image):
         try:

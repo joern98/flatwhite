@@ -138,4 +138,4 @@ class FontCheckerView(View):
             self._changed()
 
         self.__interval_change_size = task.LoopingCall(f)
-        self.__interval_change_size.start(7.0)
+        self.__interval_change_size.start(7.0, now=False)
