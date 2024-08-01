@@ -34,16 +34,18 @@ class FlatwhiteCore:
     def __change_to_view_fn(self, view: View):
         def impl():
             self.__active_view = view
-            self.__output.show_image(view.get())
-            
+            self.__show(view.get())
+
         return impl 
-            
     
     
     def __on_view_change(self, view: View):
         logging.debug(f"on_view_change called from view {view}")
         if view == self.__active_view:
-            self.__output.show_image(view.get())
+            self.__show(view.get())
+            
+    def __show(self, image):
+        self.__output.show_image(image, force_binary=True)
 
     def exit(self):
         self.__output.clear()

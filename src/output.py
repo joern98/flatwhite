@@ -17,8 +17,8 @@ class Output:
     
     def size(self):
         return (self.width, self.height)
-
-    def show_image(self, image: Image.Image):
+    
+    def show_image(self, image: Image.Image, force_binary=False):
         pass
 
     def clear(self):
@@ -34,7 +34,7 @@ class ImageShow(Output):
     def __init__(self, width = 264, height = 176) -> None:
         super().__init__(width, height)
 
-    def show_image(self, image: Image.Image):
+    def show_image(self, image: Image.Image, force_binary=False):
         image.show(f"ImageShow, {self.width}x{self.height}")
 
 
@@ -50,14 +50,34 @@ class EPD(Output):
 
         super().__init__(self.epd.height, self.epd.width)
 
-    def show_image(self, image: Image.Image):
+    def show_image(self, image: Image.Image, force_binary=False):
+        try:
+            if image.mode == '1' or force_binary:
+                self.__show_image_binary(image)
+            elif image.mode == 'L':
+                self.__show_image_greyscale(image)
+            else:
+                logging.error("Image mode '{image.mode}' not supported!")
+                
+        except:
+            self.clean()
+            logging.error("An error occured during image display!")
+
+    def __show_image_greyscale(self, image: Image.Image):
         try:
             self.epd.init()
             self.epd.Init_4Gray()
             self.epd.display_4Gray(self.epd.getbuffer_4Gray(image))
             self.epd.sleep()
         except:
-            self.clean()
+            raise
+
+    def __show_image_binary(self, image: Image.Image):
+        try:
+            self.epd.init()
+            self.epd.display_Fast(self.epd.getbuffer(image))
+            self.epd.sleep()
+        except:
             raise
 
     def clear(self):

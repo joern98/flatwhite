@@ -77,5 +77,5 @@ except:
         global __run
         __run = False
 
-reactor.addSystemEventTrigger("before", "shutdown", stop_thread)
+    reactor.addSystemEventTrigger("before", "shutdown", stop_thread)
 

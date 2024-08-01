@@ -47,7 +47,7 @@ class CurrentTrackView(View):
             self.__textbox_artist,
             self.__textbox_title,
             self.__separator,
-            self.__image_album_art, 
+            # self.__image_album_art, 
             self.__next_title, 
             self.__next_artist
         ])
