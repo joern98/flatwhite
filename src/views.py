@@ -114,7 +114,7 @@ class FontCheckerView(View):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__textbox = Textbox(2,2,WIDTH-3, HEIGHT-3, "ABCDEFGHIJ KLMNOPQRST UVWXYZÄÖÜß 1234567890 !ß.,-_+#°:;=%", font=Textbox.LARGE)
+        self.__textbox = Textbox(2,2,WIDTH-3, HEIGHT-3, "ABCDEFGHIJ KLMNOPQRST UVWXYZÄÖÜß 1234567890 !?.,-_+#°:;=%", font=Textbox.LARGE, color=GRAY_LIGHT)
 
         self._elements.append(self.__textbox)
 

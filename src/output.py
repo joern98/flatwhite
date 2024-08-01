@@ -36,7 +36,7 @@ class ImageShow(Output):
 
     def show_image(self, image: Image.Image, force_binary=False):
         if force_binary:
-            image = image.point(lambda x: 255 if x > 228 else 0, '1')
+            image = image.point(lambda x: 255 if x > 248 else 0, '1')
         image.show(f"ImageShow, {self.width}x{self.height}")
 
 
@@ -76,7 +76,7 @@ class EPD(Output):
 
     def __show_image_binary(self, image: Image.Image):
         if image.mode == 'L':
-            image = image.point(lambda x: 255 if x > 220 else 0, '1')
+            image = image.point(lambda x: 255 if x > 248 else 0, '1')
         try:
             self.epd.init_Fast()
             self.epd.display_Fast(self.epd.getbuffer(image))
