@@ -30,6 +30,9 @@ class View:
         if self._on_change_callback is not None:
             self._on_change_callback(self)
 
+    def initialize(self):
+        pass
+
 
 
 class CurrentTrackView(View):
@@ -106,3 +109,19 @@ class WeatherView(View):
         self.__next_date.text = iso_date.strftime("%d.%m.%Y")
         self._changed()
         
+
+class FontCheckerView(View):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.__textbox = Textbox(2,2,WIDTH-3, HEIGHT-3, "ABCDEFGHIJ KLMNOPQRST UVWXYZÄÖÜß 1234567890 !ß.,-_+#°:;=%", font=Textbox.LARGE)
+
+        self._elements.append(self.__textbox)
+
+    def initialize(self):
+        def f():
+            self.__textbox.font_index = Textbox.LARGE if self.__textbox.font_index == Textbox.SMALL else Textbox.SMALL
+            self._changed()
+
+        self.__interval_change_size = task.LoopingCall(f)
+        self.__interval_change_size.start(7.0)

@@ -5,7 +5,7 @@ from twisted.internet import reactor
 
 from .constants import RESOURCE_PATH, BLACK, GRAY_DARK, GRAY_LIGHT, WHITE
 from .input import KEY1_PRESSED, KEY2_PRESSED, KEY3_PRESSED, KEY4_PRESSED
-from .views import CurrentTrackView, View, WeatherView
+from .views import CurrentTrackView, View, WeatherView, FontCheckerView
 
 if platform.system() == "Linux":
     from .output import EPD as Output
@@ -24,13 +24,17 @@ class FlatwhiteCore:
         self.__weather_view.initialize()
         self.__weather_view.on_change(self.__on_view_change)
 
+        self.__font_checker_view = FontCheckerView()
+        self.__font_checker_view.initialize()
+        self.__font_checker_view.on_change(self.__on_view_change)
+
         self.__active_view = None
 
         KEY1_PRESSED.subscribe(self.__change_to_view_fn(self.__current_track_view))
         KEY2_PRESSED.subscribe(self.__change_to_view_fn(self.__weather_view))
 
-        self.__change_to_view_fn(self.__weather_view)()
-
+        self.__change_to_view_fn(self.__font_checker_view)()
+        
     def __change_to_view_fn(self, view: View):
         def impl():
             self.__active_view = view
