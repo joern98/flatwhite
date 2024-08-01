@@ -73,6 +73,8 @@ class EPD(Output):
             raise
 
     def __show_image_binary(self, image: Image.Image):
+        if image.mode == 'L':
+            image = image.point(lambda x: 255 if x == 255 else 0, '1')
         try:
             self.epd.init_Fast()
             self.epd.display_Fast(self.epd.getbuffer(image))
