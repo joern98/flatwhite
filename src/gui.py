@@ -54,9 +54,9 @@ class Rectangle(GUI_Element):
         logging.debug(f"Draw rectangle on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)}")
 
 class Textbox(GUI_Element):
-
-    __fonts = [ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 24), 
-               ImageFont.truetype(os.path.join(RESOURCE_PATH, "coolvetica", "coolvetica rg.otf"), 18)]
+    FONT_PATH = os.path.join(RESOURCE_PATH, "Open_Sans", "static", "OpenSans-Light.ttf")
+    __fonts = [ImageFont.truetype(FONT_PATH, 24), 
+               ImageFont.truetype(FONT_PATH, 16)]
     LARGE = 0
     SMALL = 1
 
@@ -73,15 +73,18 @@ class Textbox(GUI_Element):
         logging.debug(f"Draw textbox on canvas with bounds {(self.x0, self.y0, self.x1, self.y1)} and text '{self.text}' adjusted to {repr(adjusted_text)}")
 
     def __get_truncated_text(self, canvas: ImageDraw.ImageDraw):
+        if len(self.text) == 0:
+            return ""
         line_length = self.__get_max_line_length(self.text, canvas)
         if line_length < len(self.text):
-            return self.text[:line_length-1] + '...'
+            return self.text[:line_length]
         return self.text
 
     def __get_max_line_length(self, text, canvas: ImageDraw.ImageDraw):
         i = 0
         while canvas.textbbox(self.bounds()[:2], text[:i], font=self.__fonts[self.font_index])[2] <= self.x1 and i < len(text):
             i += 1
+        # i is first index that breaks bounds
         return i
     
     def __find_previous_space_index(self, text, start):
@@ -89,8 +92,11 @@ class Textbox(GUI_Element):
         for i in range(start, 0, -1):
             if text[i] == ' ':
                 return i
+        return start
             
     def __get_wrapped_text(self, canvas: ImageDraw.ImageDraw):
+        if len(self.text) == 0:
+            return ""
         a, b = "", self.text
         max_line_length = self.__get_max_line_length(self.text, canvas)
         while canvas.multiline_textbbox(self.bounds()[:2], b, font=self.__fonts[self.font_index])[2] > self.x1:
@@ -178,16 +184,17 @@ class GUIImage(GUI_Element):
 class GUI_Renderer:
     # render the actual GUI into a PIL.Image of size WIDTH x HEIGHT
     # handle low lever rendering and provide functions like draw_rectangle() or draw_text()
-    def __init__(self, width, height) -> None:
+    def __init__(self, width, height, mode='L') -> None:
         self.__image = None
         self.width = width
         self.height = height
+        self.mode = mode
 
     def get_image(self):
         return self.__image
     
     def render(self, elements: List[GUI_Element]):
-        image = Image.new('L', (self.width, self.height), WHITE)
+        image = Image.new(self.mode, (self.width, self.height), WHITE)
         draw = ImageDraw.Draw(image)
         if len(elements) > 0:
             for e in elements:

@@ -15,7 +15,7 @@ from .sonos import SonosService, TrackDataPayload
 class View:
 
     def __init__(self) -> None:
-        self.__renderer = GUI_Renderer(WIDTH, HEIGHT)
+        self.__renderer = GUI_Renderer(WIDTH, HEIGHT, mode='L')
         self._elements = []
         self._on_change_callback = None
 
@@ -77,7 +77,7 @@ class WeatherView(View):
         self.__current_temperature = Textbox(self.PADDING, self.PADDING, WIDTH-1-self.PADDING, self.PADDING + 20, "xx °C")
         self.__next_temperature_max = Textbox(self.PADDING, self.HALF_HEIGHT + self.PADDING, WIDTH-1-self.PADDING, self.PADDING + 20, "xx °C")
         self.__next_temperature_min = Textbox(self.PADDING, self.HALF_HEIGHT + self.PADDING + 26, WIDTH-1-self.PADDING, self.HALF_HEIGHT + self.PADDING + 46, "xx °C", font=Textbox.SMALL)
-        self.__next_date = Textbox(2*WIDTH//3, self.PADDING + self.HALF_HEIGHT, WIDTH-1, self.PADDING + self.HALF_HEIGHT + 20, "2024-07-31", font=Textbox.SMALL)
+        self.__next_date = Textbox(5*WIDTH//8, self.PADDING + self.HALF_HEIGHT, WIDTH-1, self.PADDING + self.HALF_HEIGHT + 20, "05.05.1998", font=Textbox.SMALL, wrap=False)
 
         self._elements.extend([
             self.__separator, 
@@ -103,6 +103,6 @@ class WeatherView(View):
         self.__next_temperature_max.text = str(weather["daily"]["temperature_2m_max"][next_day_index]) + ' ' + temperature_unit_str
         self.__next_temperature_min.text = str(weather["daily"]["temperature_2m_min"][next_day_index]) + ' ' + temperature_unit_str
         iso_date = datetime.date.fromisoformat(weather['daily']['time'][next_day_index])
-        self.__next_date.text = iso_date.strftime("%d/%m/%Y")
+        self.__next_date.text = iso_date.strftime("%d.%m.%Y")
         self._changed()
         

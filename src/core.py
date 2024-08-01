@@ -43,7 +43,7 @@ class FlatwhiteCore:
         logging.debug(f"on_view_change called from view {view}")
         if view == self.__active_view:
             self.__show(view.get())
-            
+
     def __show(self, image):
         self.__output.show_image(image, force_binary=True)
 
