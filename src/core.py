@@ -37,7 +37,7 @@ class FlatwhiteCore:
         
     def __change_to_view_fn(self, view: View):
         def impl():
-            if self.__show(view.get()):
+            if self.__show(view):
                 self.__active_view = view
 
         return impl 
@@ -45,9 +45,11 @@ class FlatwhiteCore:
     
     def __on_view_change(self, view: View):
         if view == self.__active_view:
-            self.__show(view.get())
+            self.__show(view)
 
-    def __show(self, image):
+    def __show(self, view: View):
+        image = view.get()
+        logging.debug(f"Show {view.__class__.__name__} with image <{id(image)}>")
         return self.__output.show_image(image, force_binary=True)
 
     def exit(self):
