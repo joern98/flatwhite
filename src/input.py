@@ -26,10 +26,10 @@ KEY2_PRESSED = Observable()
 KEY3_PRESSED = Observable()
 KEY4_PRESSED = Observable()
 
-KEY1_PRESSED.subscribe(lambda: logging.debug("KEY1 pressed!"))
-KEY2_PRESSED.subscribe(lambda: logging.debug("KEY2 pressed!"))
-KEY3_PRESSED.subscribe(lambda: logging.debug("KEY3 pressed!"))
-KEY4_PRESSED.subscribe(lambda: logging.debug("KEY4 pressed!"))
+KEY1_PRESSED.subscribe(lambda: logging.info("KEY1 pressed!"))
+KEY2_PRESSED.subscribe(lambda: logging.info("KEY2 pressed!"))
+KEY3_PRESSED.subscribe(lambda: logging.info("KEY3 pressed!"))
+KEY4_PRESSED.subscribe(lambda: logging.info("KEY4 pressed!"))
 
 try:
     from gpiozero import Button
