@@ -2,7 +2,7 @@ import logging
 import os
 from typing import List
 
-from PIL import Image, ImageDraw, ImageFont, ImagePalette
+from PIL import Image, ImageDraw, ImageFont
 
 from .output import Output
 from .constants import RESOURCE_PATH, BLACK, WHITE, GRAY_LIGHT, GRAY_DARK

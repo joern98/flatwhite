@@ -1,9 +1,10 @@
 from io import BytesIO
 import logging
+import os
 import requests
 import datetime
 
-from PIL import Image
+from PIL import Image, ImageChops
 from twisted.internet import reactor, task
 
 from  .weather import WeatherService
@@ -73,6 +74,15 @@ class CurrentTrackView(View):
 class WeatherView(View):
     HALF_HEIGHT = HEIGHT//2
     PADDING = 2
+    WMO_ICON_MAPPING = {
+        0: "wi-day-sunny",
+        1: "wi-day-sunny-overcast",
+        2: "wi-day-cloudy",
+        3: "wi-cloud",
+        51: "wi-sprinkle",
+        53: "wi-showers",
+        55: "wi-rain"
+    }
 
     def __init__(self) -> None:
         super().__init__()
@@ -80,14 +90,19 @@ class WeatherView(View):
         self.__current_temperature = Textbox(self.PADDING, self.PADDING, WIDTH-1-self.PADDING, self.PADDING + 20, "xx °C")
         self.__next_temperature_max = Textbox(self.PADDING, self.HALF_HEIGHT + self.PADDING, WIDTH-1-self.PADDING, self.PADDING + 20, "xx °C")
         self.__next_temperature_min = Textbox(self.PADDING, self.HALF_HEIGHT + self.PADDING + 26, WIDTH-1-self.PADDING, self.HALF_HEIGHT + self.PADDING + 46, "xx °C", font=Textbox.SMALL)
-        self.__next_date = Textbox(5*WIDTH//8, self.PADDING + self.HALF_HEIGHT, WIDTH-1, self.PADDING + self.HALF_HEIGHT + 20, "05.05.1998", font=Textbox.SMALL, wrap=False)
+        self.__next_date = Textbox(5*WIDTH//8, HEIGHT - 25, WIDTH-1, HEIGHT - self.PADDING, "05.05.1998", font=Textbox.SMALL, wrap=False)
+        self.__current_icon = GUIImage(WIDTH-64, 0, WIDTH-1, 63)
+        self.__next_icon = GUIImage(WIDTH-64, self.HALF_HEIGHT+1, WIDTH-1, self.HALF_HEIGHT+64)
+
 
         self._elements.extend([
             self.__separator, 
             self.__current_temperature, 
             self.__next_temperature_max, 
             self.__next_temperature_min, 
-            self.__next_date
+            self.__next_icon,
+            self.__current_icon,
+            self.__next_date,
         ])
 
     def initialize(self):
@@ -107,8 +122,25 @@ class WeatherView(View):
         self.__next_temperature_min.text = str(weather["daily"]["temperature_2m_min"][next_day_index]) + ' ' + temperature_unit_str
         iso_date = datetime.date.fromisoformat(weather['daily']['time'][next_day_index])
         self.__next_date.text = iso_date.strftime("%d.%m.%Y")
+
+        current_icon = self.__get_weather_icon_for_wmo(weather["current"]["weather_code"])
+        next_icon = self.__get_weather_icon_for_wmo(weather["daily"]["weather_code"][next_day_index])
+        self.__current_icon.set_image(current_icon)
+        self.__next_icon.set_image(next_icon)
+
         self._changed()
-        
+
+    def __get_weather_icon_for_wmo(self, wmo):
+        try:
+            icon_name = self.WMO_ICON_MAPPING[wmo]
+        except KeyError:
+            icon_name = "wi-na"
+
+        icon = Image.open(os.path.join(RESOURCE_PATH, "weather_icons", "png_64", icon_name + '.png'))
+        icon = icon.convert('LA')
+        l, a = icon.split()
+        icon = ImageChops.invert(a)
+        return icon
 
 class FontCheckerView(View):
 
