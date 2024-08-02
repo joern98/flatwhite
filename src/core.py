@@ -33,7 +33,7 @@ class FlatwhiteCore:
         KEY1_PRESSED.subscribe(self.__change_to_view_fn(self.__current_track_view))
         KEY2_PRESSED.subscribe(self.__change_to_view_fn(self.__weather_view))
         KEY3_PRESSED.subscribe(self.__change_to_view_fn(self.__font_checker_view))
-        self.__change_to_view_fn(self.__font_checker_view)()
+        self.__change_to_view_fn(self.__weather_view)()
         
     def __change_to_view_fn(self, view: View):
         def impl():
